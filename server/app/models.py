@@ -49,6 +49,9 @@ class Transaction(BaseModel):
 class Statement(BaseModel):
     """Schema the AI extraction must return."""
 
+    # Scope-check guardrail from SYSTEM_EXTRACTION_PROMPT: false for non-financial input.
+    is_financial_document: bool = True
+    rejection_reason: Optional[str] = None
     transactions: list[Transaction] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list, description="Explains any uncertainty")
 

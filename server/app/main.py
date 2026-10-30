@@ -178,6 +178,10 @@ async def extract(
     except Exception as exc:  # network, quota, bad JSON, schema mismatch...
         raise HTTPException(status_code=502, detail=f"Gemini extraction failed: {exc}")
 
+    if getattr(statement, "is_financial_document", True) is False:
+        reason = getattr(statement, "rejection_reason", None) or "the input does not look like financial transactions"
+        raise HTTPException(status_code=422, detail=f"Not a financial document: {reason}")
+
     # Second validation layer: never trust AI output, even if it claims to match the schema.
     raw_items = getattr(statement, "transactions", None) or []
     notes = [str(n) for n in (getattr(statement, "notes", None) or [])]
